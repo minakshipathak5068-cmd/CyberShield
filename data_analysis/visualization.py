@@ -1,54 +1,47 @@
+
 import pandas as pd
 import matplotlib.pyplot as plt
+from pathlib import Path
 
+# Project ke dataset ka path
+project_root = Path(__file__).resolve().parent.parent
+file_path = project_root / "ai" / "dataset" / "spam.csv"
 
-def create_chart(data):
-    """
-    Create a chart showing CyberShield message categories.
-    """
+# Dataset load karo
+df = pd.read_csv(file_path)
 
-    df = pd.DataFrame(data)
+# Spam aur Ham messages count karo
+counts = df["label"].astype(str).str.strip().str.lower().value_counts()
 
-    if df.empty or "result" not in df.columns:
-        print("No data available for visualization.")
-        return
+spam_count = int(counts.get("spam", 0))
+ham_count = int(counts.get("ham", 0))
 
-    results = df["result"].astype(str).str.lower()
+# Bar chart
+plt.figure(figsize=(7, 5))
+plt.bar(
+    ["Spam", "Ham (Genuine)"],
+    [spam_count, ham_count]
+)
+plt.title("CyberShield: Spam vs Genuine Messages")
+plt.xlabel("Message Type")
+plt.ylabel("Number of Messages")
+plt.tight_layout()
 
-    safe = results.str.contains("safe").sum()
-    suspicious = results.str.contains("suspicious").sum()
-    dangerous = results.str.contains(
-        "dangerous|malicious|phishing"
-    ).sum()
+# Graph save karo
+output_path = project_root / "data_analysis" / "spam_ham_bar_chart.png"
+plt.savefig(output_path)
+print("Bar chart saved at:", output_path)
 
-    categories = [
-        "Safe",
-        "Suspicious",
-        "Dangerous"
-    ]
+plt.show()
 
-    values = [
-        safe,
-        suspicious,
-        dangerous
-    ]
-
-    plt.bar(categories, values)
-
-    plt.title("CyberShield Message Analysis")
-    plt.xlabel("Message Category")
-    plt.ylabel("Number of Messages")
-
-    plt.show()
-
-
-if __name__ == "__main__":
-
-    sample_data = [
-        {"message": "Hello", "result": "Safe"},
-        {"message": "Click suspicious link", "result": "Suspicious"},
-        {"message": "Your account is hacked", "result": "Dangerous"},
-        {"message": "Good morning", "result": "Safe"}
-    ]
-
-    create_chart(sample_data)
+# Pie chart
+plt.figure(figsize=(6, 6))
+plt.pie(
+    [spam_count, ham_count],
+    labels=["Spam", "Ham (Genuine)"],
+    autopct="%1.1f%%",
+    startangle=90
+)
+plt.title("Spam vs Genuine Messages Distribution")
+plt.tight_layout()
+plt.show()

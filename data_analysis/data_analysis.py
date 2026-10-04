@@ -1,70 +1,27 @@
 import pandas as pd
-from data_cleaning import clean_data
+from pathlib import Path
 
 
-def analyze_data(data):
-    """
-    Perform basic statistical analysis on CyberShield data.
-    """
+def analyze_data():
+    project_root = Path(__file__).resolve().parent.parent
+    file_path = project_root / "ai" / "dataset" / "spam.csv"
 
-    df = clean_data(data)
+    df = pd.read_csv(file_path)
 
-    if df.empty:
-        return {
-            "total_messages": 0,
-            "safe_messages": 0,
-            "suspicious_messages": 0,
-            "dangerous_messages": 0
-        }
+    if not {"label", "text"}.issubset(df.columns):
+        raise ValueError("CSV must contain label and text columns.")
 
-    total_messages = len(df)
+    df = df.dropna(subset=["label", "text"]).drop_duplicates()
+    df["label"] = df["label"].astype(str).str.strip().str.lower()
 
-    safe_messages = 0
-    suspicious_messages = 0
-    dangerous_messages = 0
-
-    if "result" in df.columns:
-        results = df["result"].astype(str).str.lower()
-
-        safe_messages = results.str.contains("safe").sum()
-        suspicious_messages = results.str.contains("suspicious").sum()
-        dangerous_messages = (
-            results.str.contains("dangerous|malicious|phishing").sum()
-        )
-
-    return {
-        "total_messages": int(total_messages),
-        "safe_messages": int(safe_messages),
-        "suspicious_messages": int(suspicious_messages),
-        "dangerous_messages": int(dangerous_messages)
-    }
+    print("CyberShield - Spam Email Data Analysis")
+    print("--------------------------------------")
+    print("Total Messages:", len(df))
+    print("Spam Messages:", int((df["label"] == "spam").sum()))
+    print("Ham (Safe) Messages:", int((df["label"] == "ham").sum()))
+    print("Missing Values Remaining:", int(df[["label", "text"]].isnull().sum().sum()))
+    print("Duplicate Rows Remaining:", int(df.duplicated().sum()))
 
 
 if __name__ == "__main__":
-
-    sample_data = [
-        {
-            "message": "Hello, how are you?",
-            "result": "Safe",
-            "risk": "Low"
-        },
-        {
-            "message": "Click this suspicious link",
-            "result": "Suspicious",
-            "risk": "Medium"
-        },
-        {
-            "message": "Your account has been hacked",
-            "result": "Dangerous",
-            "risk": "High"
-        }
-    ]
-
-    report = analyze_data(sample_data)
-
-    print("CyberShield Data Analysis")
-    print("-------------------------")
-    print("Total Messages:", report["total_messages"])
-    print("Safe Messages:", report["safe_messages"])
-    print("Suspicious Messages:", report["suspicious_messages"])
-    print("Dangerous Messages:", report["dangerous_messages"])
+    analyze_data()
