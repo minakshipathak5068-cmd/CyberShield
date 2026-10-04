@@ -57,9 +57,9 @@ onAuthStateChanged(auth, async (user) => {
 
     } catch (error) {
 
-        console.error(error);
+    console.error("HISTORY ERROR:", error);
 
-        historyList.textContent =
-            "Unable to load history.";
-    }
+    historyList.textContent =
+        "Error: " + error.message;
+}
 });

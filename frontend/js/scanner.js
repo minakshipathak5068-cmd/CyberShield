@@ -45,28 +45,47 @@ document.getElementById("scanBtn").addEventListener("click", async () => {
 
     try {
 
-        // Temporary result for Firebase testing
-        const scanResult = "Safe";
+    result.textContent = "Scanning...";
 
-        await addDoc(collection(db, "scans"), {
+    // Send message to Python AI
+    const response = await fetch("http://127.0.0.1:5000/predict", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            email: message
+        })
+    });
 
-            userId: currentUser.uid,
+    const data = await response.json();
 
-            input: message,
-
-            result: scanResult,
-
-            createdAt: serverTimestamp()
-        });
-
-        result.textContent =
-            "Scan Result: " + scanResult;
-
-    } catch (error) {
-
-        console.error(error);
-
-        result.textContent =
-            "Error saving scan.";
+    if (!response.ok) {
+        throw new Error(data.error || "AI prediction failed");
     }
+
+    const scanResult = data.prediction;
+
+    // Save AI result to Firebase
+    await addDoc(collection(db, "scans"), {
+
+        userId: currentUser.uid,
+
+        input: message,
+
+        result: scanResult,
+
+        createdAt: serverTimestamp()
+    });
+
+    result.textContent =
+        "Scan Result: " + scanResult;
+
+} catch (error) {
+
+    console.error(error);
+
+    result.textContent =
+        "Error: " + error.message;
+}
 });
