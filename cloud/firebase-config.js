@@ -8,6 +8,7 @@ import {
     getFirestore
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+
 const firebaseConfig = {
   apiKey: "AIzaSyDtoLk-xD8WU5I5mphw_89ADCUhAjzWXQY",
   authDomain: "cybershield-f0c4f.firebaseapp.com",
