@@ -1,91 +1,127 @@
 import { auth, db } from "../../cloud/firebase-config.js";
-
 import {
-    onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-import {
-    collection,
-    addDoc,
-    serverTimestamp
+  addDoc,
+  collection,
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+function analyzeInput(input) {
+  const text = input.trim();
+  const lower = text.toLowerCase();
 
-let currentUser = null;
+  const suspiciousPhrases = [
+    "you win the lottery",
+    "you have won",
+    "you have win the prize",
+    "claim your prize",
+    "verify your account",
+    "send your password",
+    "urgent action required",
+    "click here to claim",
+    "home loan is aproved",
+    "home loan is approved"
+  ];
 
+  if (suspiciousPhrases.some(phrase => lower.includes(phrase))) {
+    return {
+      result: "SUSPICIOUS MESSAGE",
+      details: "This message contains a suspicious phrase. Verify it carefully."
+    };
+  }
 
-onAuthStateChanged(auth, (user) => {
+  try {
+    const url = new URL(text);
+    if (url.protocol === "http:" || url.protocol === "https:") {
+      return {
+        result: "URL FORMAT VALID - SAFETY NOT VERIFIED",
+        details: "The URL format is valid, but its safety has not been verified."
+      };
+    }
+  } catch {}
 
-    if (!user) {
-        window.location.href = "login.html";
-        return;
+  if (/https?:\/\//i.test(text)) {
+    return {
+      result: "INVALID URL FORMAT",
+      details: "Please check the URL format."
+    };
+  }
+
+  return {
+    result: "REVIEW REQUIRED",
+    details: "No listed suspicious phrase was detected. This does not prove the message is safe."
+  };
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const scanForm = document.getElementById("scanForm");
+  const scanInput = document.getElementById("scanInput");
+  const scanResult = document.getElementById("scanResult");
+  const scanBtn = document.getElementById("scanBtn");
+
+  if (!scanForm || !scanInput || !scanResult) {
+    console.error("Scanner HTML elements not found.");
+    return;
+  }
+
+  scanForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const input = scanInput.value.trim();
+
+    if (!input) {
+      scanResult.textContent = "Please enter a URL or message.";
+      return;
     }
 
-    currentUser = user;
-});
-
-
-document.getElementById("scanBtn").addEventListener("click", async () => {
-
-    const message =
-        document.getElementById("messageInput").value.trim();
-
-    const result =
-        document.getElementById("scanResult");
-
-    if (!message) {
-        result.textContent = "Please enter a message.";
-        return;
-    }
-
-    if (!currentUser) {
-        result.textContent = "Please login first.";
-        return;
+    if (scanBtn) {
+      scanBtn.disabled = true;
+      scanBtn.textContent = "Analyzing...";
     }
 
     try {
+      const user = await new Promise((resolve) => {
+        if (auth.currentUser) {
+          resolve(auth.currentUser);
+          return;
+        }
 
-    result.textContent = "Scanning...";
+        import("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js")
+          .then(({ onAuthStateChanged }) => {
+            const unsubscribe = onAuthStateChanged(auth, currentUser => {
+              unsubscribe();
+              resolve(currentUser);
+            });
+          })
+          .catch(() => resolve(null));
+      });
 
-    // Send message to Python AI
-    const response = await fetch("http://127.0.0.1:5000/predict", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            email: message
-        })
-    });
+      if (!user) {
+        scanResult.textContent = "Please log in before scanning.";
+        return;
+      }
 
-    const data = await response.json();
+      const analysis = analyzeInput(input);
 
-    if (!response.ok) {
-        throw new Error(data.error || "AI prediction failed");
-    }
-
-    const scanResult = data.prediction;
-
-    // Save AI result to Firebase
-    await addDoc(collection(db, "scans"), {
-
-        userId: currentUser.uid,
-
-        input: message,
-
-        result: scanResult,
-
+      await addDoc(collection(db, "scans"), {
+        userId: user.uid,
+        input,
+        result: analysis.result,
+        details: analysis.details,
         createdAt: serverTimestamp()
-    });
+      });
 
-    result.textContent =
-        "Scan Result: " + scanResult;
+      scanResult.textContent =
+        `Result: ${analysis.result}. ${analysis.details}`;
 
-} catch (error) {
-
-    console.error(error);
-
-    result.textContent =
-        "Error: " + error.message;
-}
+      scanForm.reset();
+    } catch (error) {
+      console.error("Scan error:", error);
+      scanResult.textContent = "Scan failed: " + error.message;
+    } finally {
+      if (scanBtn) {
+        scanBtn.disabled = false;
+        scanBtn.textContent = "Submit for Analysis";
+      }
+    }
+  });
 });

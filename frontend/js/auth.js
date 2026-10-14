@@ -1,4 +1,6 @@
+
 import { auth, db } from "../../cloud/firebase-config.js";
+
 import {
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword
@@ -10,92 +12,68 @@ import {
     serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+console.log("CyberShield auth.js loaded");
 
-// SIGNUP
-const signupBtn = document.getElementById("signupBtn");
+const loginForm = document.getElementById("loginForm");
 
-if (signupBtn) {
+if (loginForm) {
+    loginForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
 
-    signupBtn.addEventListener("click", async () => {
+        const email = document.getElementById("loginEmail").value.trim();
+        const password = document.getElementById("loginPassword").value;
+        const message = document.getElementById("loginMessage");
+        const button = document.getElementById("loginBtn");
+
+        button.disabled = true;
+        message.textContent = "Logging in...";
+
+        try {
+            await signInWithEmailAndPassword(auth, email, password);
+            message.textContent = "Login successful!";
+            window.location.href = "home.html";
+        } catch (error) {
+            console.error("Login error:", error);
+            message.textContent = error.code + ": " + error.message;
+        } finally {
+            button.disabled = false;
+        }
+    });
+}
+
+const signupForm = document.getElementById("signupForm");
+
+if (signupForm) {
+    signupForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
 
         const name = document.getElementById("name").value.trim();
         const email = document.getElementById("email").value.trim();
         const password = document.getElementById("password").value;
-
         const message = document.getElementById("message");
+        const button = document.getElementById("signupBtn");
 
-        if (!name || !email || !password) {
-            message.textContent = "Please fill all fields.";
-            return;
-        }
+        button.disabled = true;
+        message.textContent = "Creating account...";
 
         try {
+            const result = await createUserWithEmailAndPassword(
+                auth, email, password
+            );
 
-            const userCredential =
-                await createUserWithEmailAndPassword(
-                    auth,
-                    email,
-                    password
-                );
-
-            const user = userCredential.user;
-
-            await setDoc(doc(db, "users", user.uid), {
+            await setDoc(doc(db, "users", result.user.uid), {
                 name: name,
                 email: email,
                 createdAt: serverTimestamp()
             });
 
-            message.textContent = "Account created successfully.";
-
-            setTimeout(() => {
-                window.location.href = "home.html";
-            }, 1000);
-
-        } catch (error) {
-
-            console.error(error);
-            message.textContent = error.message;
-        }
-    });
-}
-
-
-// LOGIN
-const loginBtn = document.getElementById("loginBtn");
-
-if (loginBtn) {
-
-    loginBtn.addEventListener("click", async () => {
-
-        const email =
-            document.getElementById("loginEmail").value.trim();
-
-        const password =
-            document.getElementById("loginPassword").value;
-
-        const message =
-            document.getElementById("loginMessage");
-
-        if (!email || !password) {
-            message.textContent = "Please enter email and password.";
-            return;
-        }
-
-        try {
-
-            await signInWithEmailAndPassword(
-                auth,
-                email,
-                password
-            );
-
+            message.textContent = "Signup successful!";
             window.location.href = "home.html";
-
         } catch (error) {
-
-            console.error(error);
-            message.textContent = error.message;
+            console.error("Signup error:", error);
+            message.textContent = error.code + ": " + error.message;
+        } finally {
+            button.disabled = false;
         }
     });
 }

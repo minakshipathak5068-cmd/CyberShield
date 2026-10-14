@@ -1,40 +1,73 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>CyberShield - Scanner</title>
-    <link rel="stylesheet" href="css/style.css">
-</head>
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberShield - Scanner</title>
+    <link rel="stylesheet" href="./css/style.css">
+</head>
 <body>
 
-<div class="container">
+<nav class="navbar">
+    <a href="home.html" class="brand">
+        <span class="brand-icon">🛡</span>
+        CyberShield
+    </a>
 
-    <h1>Message Scanner</h1>
+    <div class="nav-links">
+        <a href="home.html">Dashboard</a>
+        <a href="scanner.html">Scanner</a>
+        <a href="history.html">Scan History</a>
+    </div>
+</nav>
 
-    <textarea
-        id="messageInput"
-        placeholder="Enter a message to scan">
-    </textarea>
+<main class="container">
+    <section class="hero">
+        <span class="eyebrow">● SECURITY TOOLS</span>
+        <h1>Message & URL Scanner</h1>
+        <p>
+            Enter a URL or message to check for potential security risks.
+            Your submitted input can be saved to your scan history.
+        </p>
+    </section>
 
-    <button id="scanBtn">
-        Scan Message
-    </button>
+    <section class="card scanner-card">
+        <div class="card-icon">🔍</div>
+        <h2>Analyze Suspicious Content</h2>
+        <p>Paste the URL or message you want to review below.</p>
 
-    <h3>Result:</h3>
+        <form id="scanForm">
+            <label for="scanInput">URL or message</label>
+            <textarea
+                id="scanInput"
+                name="scanInput"
+                placeholder="Example: https://example.com or a suspicious message"
+                required
+            ></textarea>
 
-    <p id="scanResult"></p>
+            <button type="submit" class="btn" id="scanBtn">
+                Submit for Analysis
+            </button>
+        </form>
 
-    <button onclick="window.location.href='history.html'">
-        View History
-    </button>
+        <p id="scanResult" class="message" role="status"></p>
+        <p class="scanner-note">
+            Note: Automated security analysis is not connected yet.
+            Submitting content does not currently verify whether it is safe.
+        </p>
+    </section>
 
-    <button onclick="window.location.href='home.html'">
-        Home
-    </button>
+    <div class="section">
+        <a href="home.html" class="btn btn-secondary">← Back to Dashboard</a>
+        <a href="history.html" class="btn btn-secondary">View Scan History</a>
+    </div>
+</main>
 
-</div>
+<footer class="footer">
+    CyberShield · Your Digital Safety Companion
+</footer>
 
-<script type="module" src="js/scanner.js"></script>
-
+<script type="module" src="./js/scanner.js"></script>
 </body>
 </html>

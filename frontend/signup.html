@@ -1,31 +1,42 @@
+```html
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>CyberShield - Signup</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberShield - Sign Up</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
-
 <body>
+<div class="auth-container">
+    <a href="index.html" class="brand">
+        <span class="brand-icon">🛡</span>
+        CyberShield
+    </a>
 
-<div class="container">
-    <h1>CyberShield</h1>
-    <h2>Create Account</h2>
+    <h1>Create Account</h1>
+    <p>Join CyberShield and manage your security checks.</p>
 
-    <input type="text" id="name" placeholder="Enter Name">
-    <input type="email" id="email" placeholder="Enter Email">
-    <input type="password" id="password" placeholder="Enter Password">
+    <form id="signupForm">
+        <label for="name">Full Name</label>
+        <input type="text" id="name" placeholder="Enter your name" required>
 
-    <button id="signupBtn">Sign Up</button>
+        <label for="email">Email Address</label>
+        <input type="email" id="email" placeholder="you@example.com" required>
 
-    <p id="message"></p>
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Create a password" required minlength="6">
 
-    <p>
-        Already have an account?
-        <a href="login.html">Login</a>
-    </p>
+        <button type="submit" class="btn">Create Account →</button>
+    </form>
+
+    <p id="message" class="message" aria-live="polite"></p>
+
+    <p>Already registered? <a href="login.html">Login</a></p>
+    <p><a href="index.html">← Back to Home</a></p>
 </div>
 
 <script type="module" src="js/auth.js"></script>
-
 </body>
 </html>
+```

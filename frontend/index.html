@@ -3,29 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>CyberShield</title>
-
+    <title>CyberShield | Digital Security</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
-
 <body>
 
-    <div class="container">
+<nav class="navbar">
+    <a href="index.html" class="brand">
+        <span class="brand-icon">🛡</span>
+        CyberShield
+    </a>
 
-        <h1>CyberShield</h1>
-
-        <p>Protect yourself from cyber threats.</p>
-
-        <button onclick="window.location.href='login.html'">
-            Login
-        </button>
-
-        <button onclick="window.location.href='signup.html'">
-            Create Account
-        </button>
-
+    <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="login.html">Login</a>
+        <a href="signup.html">Sign Up</a>
     </div>
+</nav>
+
+<main class="container">
+    <section class="hero">
+        <span class="eyebrow">● SMART CYBERSECURITY PLATFORM</span>
+
+        <h1>Your Digital World.<br>
+            <span>Protected Smarter.</span>
+        </h1>
+
+        <p>
+            CyberShield is designed to help users examine suspicious
+            messages, review security results, and maintain a history
+            of their security checks in one place.
+        </p>
+
+        <a href="signup.html" class="btn">Get Started →</a>
+        <a href="login.html" class="btn btn-secondary">Login</a>
+    </section>
+
+    <section class="section" id="features">
+        <h2 class="section-title">Explore Our Features</h2>
+
+        <div class="grid">
+            <article class="card">
+                <div class="card-icon">🔍</div>
+                <h3>Message Scanner</h3>
+                <p>Submit a message for analysis by the connected detection system.</p>
+                <span class="status">Scanner Module</span>
+            </article>
+
+            <article class="card">
+                <div class="card-icon">🔐</div>
+                <h3>Account Security</h3>
+                <p>Access your account through Firebase Authentication.</p>
+                <span class="status">Authentication</span>
+            </article>
+
+            <article class="card">
+                <div class="card-icon">📊</div>
+                <h3>Scan History</h3>
+                <p>Review previously saved scan results associated with your account.</p>
+                <span class="status">Cloud Database</span>
+            </article>
+        </div>
+    </section>
+
+    <section class="section card">
+        <h2>Stay Aware. Stay Secure.</h2>
+        <p>
+            Check suspicious content carefully. Do not share passwords,
+            OTPs, or confidential information with untrusted sources.
+        </p>
+        <a href="signup.html" class="btn">Create Your Account</a>
+    </section>
+</main>
+
+<footer class="footer">
+    © 2026 CyberShield · Student Cybersecurity Project
+</footer>
 
 </body>
 </html>
